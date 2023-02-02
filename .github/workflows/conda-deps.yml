@@ -1,0 +1,10 @@
+#we use the default conda-incubator/setup-miniconda env name 
+name: test
+dependencies:
+  - cmake
+  - clang>=14.0.0
+  - make
+  - ninja
+  - pkg-config
+  - catch2>=3.3.0
+  - eigen>=3.0.0
