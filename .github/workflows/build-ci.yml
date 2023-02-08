@@ -18,8 +18,11 @@ env:
     action-save-cache: 'true'
     # define conda-installed dependencies in a file to use it's hash in the cache key
     CONDA_DEPS_FILE: '.github/workflows/conda-deps.yml' 
-    # define conda-installed dependencies in a file to use it's hash in the cache key
-    SOURCE_DEPS_FILE: '.github/workflows/source-deps.txt'
+    # define source-compiled dependencies repos in a file to use it's hash in the cache key
+    SOURCE_DEPS_FILE: '.github/workflows/source-deps.yml'
+    # define source-compiled build infos in a file to use it's hash in the cache key
+    SOURCE_DEPS_CONFIG_FILE: '.github/workflows/source-deps.yml' #TODO use another file
+
 
 jobs:
     build:
@@ -54,12 +57,6 @@ jobs:
           shell: bash
           run: |
             echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-
-        # Import source-deps tags
-        - name: Import source dependencies tags
-          shell: bash
-          run: |
-            cat ${SOURCE_DEPS_FILE} >> $GITHUB_ENV
 
         # Use conda for main dependencies
         - uses: conda-incubator/setup-miniconda@v2
@@ -104,48 +101,71 @@ jobs:
             key: ${{ matrix.os }}-conda-${{ hashFiles(env.CONDA_DEPS_FILE) }}-${{ env.DATE }}
           id: cache-save-conda-deps
         
-        - name: Restore cached source-based dependencies
+        - name: Restore cached source dependencies
           if: ${{ env.action-restore-cache == 'true' && steps.cache-restore-conda-deps.outputs.cache-hit == 'true' }}
           uses: actions/cache/restore@v3
           with:
-            path: ${{ github.workspace }}/install/deps
+            path: ${{ github.workspace }}/deps_src
             key: ${{ matrix.os }}-${{ matrix.build_type }}-source-${{hashFiles(env.SOURCE_DEPS_FILE)}}-${{ env.DATE }}
           id: cache-restore-source-deps
 
-        - name: Source-based dependencies
+        - name: Clone source-compiled dependencies
           if: ${{ steps.cache-restore-conda-deps.outputs.cache-hit != 'true' || steps.cache-restore-source-deps.outputs.cache-hit != 'true' }}
           shell: bash -l {0}
           run: |
-            # manif library
-            cd ${GITHUB_WORKSPACE}
+            # make dir for deps repos
+            mkdir -p deps_src
             # shallow clone (only for branch names and tags)
-            git clone --depth 1 --branch ${manif_TAG} https://github.com/artivis/manif.git
-            cd manif
-            mkdir -p build
-            cd build
-            cmake -G"Ninja" .. "${CMAKE_CXX_COMPILER_PATH}" "${CMAKE_C_COMPILER_PATH}" \
-                  -DCMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/install/deps \
-                  -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                  -DBUILD_SHARED_LIBS=ON
-            cmake --build . --config ${{matrix.build_type}} --target install
+            vcs import --shallow --input ${GITHUB_WORKSPACE}/.github/workflows/source-deps.yml deps_src
 
-        - name: Cache source-based dependencies
+        - name: Cache source-compiled dependencies
           if: ${{ env.action-save-cache == 'true' && steps.cache-restore-source-deps.outputs.cache-hit != 'true' }}
           uses: actions/cache/save@v3
           with:
-            path: ${{ github.workspace }}/install/deps
+            path: ${{ github.workspace }}/deps_src
             key: ${{ matrix.os }}-${{ matrix.build_type }}-source-${{hashFiles(env.SOURCE_DEPS_FILE)}}-${{ env.DATE }}
           id: cache-save-source-deps
+
+        - name: Restore source-compiled installed packages
+          if: ${{ env.action-restore-cache == 'true' && steps.cache-restore-source-deps.outputs.cache-hit == 'true' }}
+          uses: actions/cache/restore@v3
+          with:
+            path: ${{ github.workspace }}/deps_src
+            key: ${{ matrix.os }}-${{ matrix.build_type }}-source-${{hashFiles(env.SOURCE_DEPS_CONFIG_FILE)}}-${{ env.DATE }}
+          id: cache-restore-source-deps-installed
+
+        - name: Build and install source-compiled dependencies
+          if: ${{ steps.cache-restore-source-deps-installed.outputs.cache-hit != 'true' }}
+          shell: bash -l {0}
+          run: |
+            #TODO temporary
+            cd deps_src/manif
+            mkdir -p build
+            cd build
+            cmake -G"Ninja" .. "${CMAKE_CXX_COMPILER_PATH}" "${CMAKE_C_COMPILER_PATH}" \
+                  -DCMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/deps_install \
+                  -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                  -DBUILD_SHARED_LIBS=ON
+            cmake --build . --config ${{matrix.build_type}} --target install
+          id: build-install-source-deps
+
+        - name: Cache source-compiled installed dependencies
+          if: ${{ env.action-save-cache == 'true' && steps.cache-restore-source-deps-installed.outputs.cache-hit != 'true' }}
+          uses: actions/cache/save@v3
+          with:
+            path: ${{ github.workspace }}/deps_install
+            key: ${{ matrix.os }}-${{ matrix.build_type }}-source-${{hashFiles(env.SOURCE_DEPS_CONFIG_FILE)}}-${{ env.DATE }}
+          id: cache-save-source-deps-installed
 
         - name: Extend LD_LIBRARY_PATH [Ubuntu]
           if: startsWith(matrix.os, 'ubuntu')
           run: |
-            echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}${GITHUB_WORKSPACE}/install/deps/lib" >> $GITHUB_ENV
+            echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}${GITHUB_WORKSPACE}/deps_install/lib" >> $GITHUB_ENV
 
         - name: Extend PATH
           shell: bash
           run: |
-            echo "${GITHUB_WORKSPACE}/install/deps/bin" >> $GITHUB_PATH
+            echo "${GITHUB_WORKSPACE}/deps_install/bin" >> $GITHUB_PATH
             echo "${GITHUB_WORKSPACE}/build/install/bin" >> $GITHUB_PATH
         
         # ===================
@@ -159,7 +179,7 @@ jobs:
             mkdir -p build
             cd build
             cmake -G"Ninja" .. "${CMAKE_CXX_COMPILER_PATH}" "${CMAKE_C_COMPILER_PATH}" \
-                  -DCMAKE_PREFIX_PATH=${GITHUB_WORKSPACE}/install/deps \
+                  -DCMAKE_PREFIX_PATH=${GITHUB_WORKSPACE}/deps_install \
                   -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
                   -DBUILD_TESTING:BOOL=ON \
                   -DCMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/install

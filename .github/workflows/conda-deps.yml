@@ -5,6 +5,7 @@ dependencies:
   - clang>=14.0.0
   - make
   - ninja
+  - vcstool
   - pkg-config
   - catch2>=3.3.0
   - eigen>=3.0.0
