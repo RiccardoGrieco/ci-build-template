@@ -183,6 +183,7 @@ jobs:
                   -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
                   -DBUILD_TESTING:BOOL=ON \
                   -DCMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/install
+          id: configure-step
                     
         # Build step          
         - name: Build
@@ -190,19 +191,21 @@ jobs:
           run: |
             cd build
             cmake --build . --config ${{matrix.build_type}} --verbose   
-            
+          id: build-step
+
         # Test step
         - name: Test
           shell: bash -l {0}
           run: |
             cd build
             ctest --output-on-failure -C ${{ matrix.build_type }} .
+          id: test-step
 
         - name: Print CMake log and cache on failure
-          if: ${{ steps.configure.conclusion == 'failure' }}
+          if: ${{ failure() && (steps.configure-step.conclusion == 'failure' || steps.build-step.conclusion == 'failure' || steps.test-step.conclusion == 'failure') }}
           shell: bash
           run: |
             echo "----------------- CMAKE CACHE ------------------------------"
-            cat ${GITHUB_WORKSPACE}/element_wearable_sw/build/CMakeCache.txt
+            cat ${GITHUB_WORKSPACE}/build/CMakeCache.txt
             echo "----------------- CMAKE OUTPUT ------------------------------"
-            cat ${GITHUB_WORKSPACE}/element_wearable_sw/build/CMakeFiles/CMakeOutput.log
+            cat ${GITHUB_WORKSPACE}/build/CMakeFiles/CMakeOutput.log
