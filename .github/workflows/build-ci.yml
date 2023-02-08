@@ -207,5 +207,7 @@ jobs:
           run: |
             echo "----------------- CMAKE CACHE ------------------------------"
             cat ${GITHUB_WORKSPACE}/build/CMakeCache.txt
-            echo "----------------- CMAKE OUTPUT ------------------------------"
+            echo "----------------- CMAKE OUTPUT -----------------------------"
             cat ${GITHUB_WORKSPACE}/build/CMakeFiles/CMakeOutput.log
+            echo "-----------------     TREE     -----------------------------"
+            tree
