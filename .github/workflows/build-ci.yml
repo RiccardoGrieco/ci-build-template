@@ -131,7 +131,7 @@ jobs:
           uses: actions/cache/restore@v3
           with:
             path: ${{ github.workspace }}/deps_install
-            key: ${{ matrix.os }}-${{ matrix.build_type }}-source-${{hashFiles(env.SOURCE_DEPS_CONFIG_FILE)}}-${{ env.DATE }}
+            key: ${{ matrix.os }}-${{ matrix.build_type }}-source-${{hashFiles(env.SOURCE_DEPS_CONFIG_FILE)}}-${{hashFiles(env.SOURCE_DEPS_FILE)}}-${{ env.DATE }}
           id: cache-restore-source-deps-installed
 
         - name: Build and install source-compiled dependencies
@@ -162,7 +162,7 @@ jobs:
           uses: actions/cache/save@v3
           with:
             path: ${{ github.workspace }}/deps_install
-            key: ${{ matrix.os }}-${{ matrix.build_type }}-source-${{hashFiles(env.SOURCE_DEPS_CONFIG_FILE)}}-${{ env.DATE }}
+            key: ${{ matrix.os }}-${{ matrix.build_type }}-source-${{hashFiles(env.SOURCE_DEPS_CONFIG_FILE)}}-${{hashFiles(env.SOURCE_DEPS_FILE)}}-${{ env.DATE }}
           id: cache-save-source-deps-installed
 
         - name: Extend LD_LIBRARY_PATH [Ubuntu]
