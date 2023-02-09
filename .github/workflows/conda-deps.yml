@@ -5,6 +5,11 @@ dependencies:
   - clang>=14.0.0
   - make
   - ninja
+  - vcstool
+  - colcon-core
+  - colcon-cmake
+  - colcon-recursive-crawl
+  - colcon-metadata
   - pkg-config
   - catch2>=3.3.0
   - eigen>=3.0.0

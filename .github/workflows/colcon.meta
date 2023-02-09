@@ -1,0 +1,5 @@
+paths:
+  ../../deps_src/manif:
+    cmake-args:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DBUILD_TESTING=OFF
