@@ -6,6 +6,7 @@ project(cache-ci-template VERSION 0.0.1)
 find_package(Catch2 3 QUIET) # conda dependency
 find_package(Eigen3 REQUIRED) # conda dependency
 find_package(manif REQUIRED) # source dependency
+find_package(LieGroupControllers REQUIRED) #source dependency dependent on manif
 
 include(CTest)
 

@@ -131,7 +131,7 @@ jobs:
           uses: actions/cache/restore@v3
           with:
             path: ${{ github.workspace }}/deps_install
-            key: ${{ matrix.os }}-${{ matrix.build_type }}-source-${{hashFiles(env.SOURCE_DEPS_CONFIG_FILE)}}-${{ env.DATE }}
+            key: ${{ matrix.os }}-${{ matrix.build_type }}-source-${{hashFiles(env.SOURCE_DEPS_CONFIG_FILE)}}-${{hashFiles(env.SOURCE_DEPS_FILE)}}-${{ env.DATE }}
           id: cache-restore-source-deps-installed
 
         - name: Build and install source-compiled dependencies
@@ -146,7 +146,7 @@ jobs:
                     --install-base deps_install \
                     --merge-install \
                     --metas ${GITHUB_WORKSPACE}/.github/workflows/colcon.meta \
-                    --cmake-args -GNinja -DBUILD_TESTING:BOOL=OFF -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+                    --cmake-args -GNinja -DBUILD_TESTING:BOOL=OFF -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} "${CMAKE_CXX_COMPILER_PATH}" "${CMAKE_C_COMPILER_PATH}"
 
           id: build-install-source-deps
 
@@ -162,7 +162,7 @@ jobs:
           uses: actions/cache/save@v3
           with:
             path: ${{ github.workspace }}/deps_install
-            key: ${{ matrix.os }}-${{ matrix.build_type }}-source-${{hashFiles(env.SOURCE_DEPS_CONFIG_FILE)}}-${{ env.DATE }}
+            key: ${{ matrix.os }}-${{ matrix.build_type }}-source-${{hashFiles(env.SOURCE_DEPS_CONFIG_FILE)}}-${{hashFiles(env.SOURCE_DEPS_FILE)}}-${{ env.DATE }}
           id: cache-save-source-deps-installed
 
         - name: Extend LD_LIBRARY_PATH [Ubuntu]
