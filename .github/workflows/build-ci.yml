@@ -153,6 +153,7 @@ jobs:
 
         - name: Print colcon logger_all
           if: ${{ failure() && steps.build-install-source-deps.conclusion == 'failure' }}
+          shell: bash
           run: |
             echo "----------------- colcon logger_all ------------------------------"
             cat ${GITHUB_WORKSPACE}/log/latest/logger_all.log
@@ -217,5 +218,10 @@ jobs:
             cat ${GITHUB_WORKSPACE}/build/CMakeCache.txt
             echo "----------------- CMAKE OUTPUT -----------------------------"
             cat ${GITHUB_WORKSPACE}/build/CMakeFiles/CMakeOutput.log
+
+        - name: Print tree on failure
+          if: ${{ failure() }}
+          shell: bash
+          run: |
             echo "-----------------     TREE     -----------------------------"
             tree
