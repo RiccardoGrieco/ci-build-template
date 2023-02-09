@@ -13,9 +13,9 @@ on:
     
 env:
     # flag to easily "invalidate" the cache (avoids the restoration)
-    action-restore-cache: 'false'
+    action-restore-cache: 'true'
     # flag to enable the cache saving
-    action-save-cache: 'false'
+    action-save-cache: 'true'
     # define conda-installed dependencies in a file to use it's hash in the cache key
     CONDA_DEPS_FILE: '.github/workflows/conda-deps.yml' 
     # define source-compiled dependencies repos in a file to use it's hash in the cache key
