@@ -146,7 +146,7 @@ jobs:
                     --install-base deps_install \
                     --merge-install \
                     --metas ${GITHUB_WORKSPACE}/.github/workflows/colcon.meta \
-                    --cmake-args -GNinja -DBUILD_TESTING:BOOL=OFF -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+                    --cmake-args -GNinja -DBUILD_TESTING:BOOL=OFF -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} "${CMAKE_CXX_COMPILER_PATH}" "${CMAKE_C_COMPILER_PATH}"
 
           id: build-install-source-deps
 
