@@ -156,7 +156,7 @@ jobs:
           shell: bash
           run: |
             echo "----------------- colcon logger_all ------------------------------"
-            cat ${GITHUB_WORKSPACE}/log/latest/logger_all.log
+            cat ${GITHUB_WORKSPACE}/deps_log/latest/logger_all.log
 
         - name: Cache source-compiled installed dependencies
           if: ${{ env.action-save-cache == 'true' && steps.cache-restore-source-deps-installed.outputs.cache-hit != 'true' }}
