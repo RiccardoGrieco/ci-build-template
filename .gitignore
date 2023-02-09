@@ -1,1 +1,7 @@
-build
+build/
+
+# source-installed dependencies colcon paths
+deps_build/
+deps_log/
+deps_src/
+deps_install/
