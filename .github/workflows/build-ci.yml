@@ -131,7 +131,7 @@ jobs:
           if: ${{ env.action-restore-cache == 'true' && steps.cache-restore-source-deps.outputs.cache-hit == 'true' }}
           uses: actions/cache/restore@v3
           with:
-            path: ${{ github.workspace }}/deps_src
+            path: ${{ github.workspace }}/deps_install
             key: ${{ matrix.os }}-${{ matrix.build_type }}-source-${{hashFiles(env.SOURCE_DEPS_CONFIG_FILE)}}-${{ env.DATE }}
           id: cache-restore-source-deps-installed
 
