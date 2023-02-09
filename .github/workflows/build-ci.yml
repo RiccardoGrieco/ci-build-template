@@ -151,6 +151,12 @@ jobs:
 
           id: build-install-source-deps
 
+        - name: Print colcon logger_all
+          if: ${{ failure() && steps.build-install-source-deps.conclusion == 'failure' }}
+          run: |
+            echo "----------------- colcon logger_all ------------------------------"
+            cat ${GITHUB_WORKSPACE}/log/latest/logger_all.log
+
         - name: Cache source-compiled installed dependencies
           if: ${{ env.action-save-cache == 'true' && steps.cache-restore-source-deps-installed.outputs.cache-hit != 'true' }}
           uses: actions/cache/save@v3
