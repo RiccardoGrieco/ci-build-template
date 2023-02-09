@@ -140,14 +140,14 @@ jobs:
           shell: bash -l {0}
           run: |
             # build dependencies
-            colcon build --base-paths deps_src \
-                         --build-base deps_build \
-                         --install-base deps_install \
-                         --log-base deps_log \
-                         --merge-install \
-                         --metas ${GITHUB_WORKSPACE}/.github/workflows/colcon.meta \
-                         --cmake-args -GNinja -DBUILD_TESTING=OFF \
-                         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ${CMAKE_COMPILER_STRING}
+            colcon --log-base deps_log build \
+                   --base-paths deps_src \
+                   --build-base deps_build \
+                   --install-base deps_install \      
+                   --merge-install \
+                   --metas ${GITHUB_WORKSPACE}/.github/workflows/colcon.meta \
+                   --cmake-args -GNinja -DBUILD_TESTING=OFF \
+                   -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ${CMAKE_COMPILER_STRING}
 
           id: build-install-source-deps
 
