@@ -3,3 +3,7 @@ repositories:
     type: git
     url: https://github.com/artivis/manif.git
     version: devel
+  lie-group-controllers:
+    type: git
+    url: https://github.com/ami-iit/lie-group-controllers
+    version: v0.1.1
