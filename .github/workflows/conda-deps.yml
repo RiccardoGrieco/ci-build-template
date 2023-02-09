@@ -8,6 +8,7 @@ dependencies:
   - vcstool
   - colcon-core
   - colcon-cmake
+  - colcon-recursive-crawl
   - pkg-config
   - catch2>=3.3.0
   - eigen>=3.0.0
