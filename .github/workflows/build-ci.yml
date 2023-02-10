@@ -22,6 +22,8 @@ env:
     SOURCE_DEPS_FILE: '.github/workflows/source-deps.yml'
     # define source-compiled build infos in a file to use it's hash in the cache key
     SOURCE_DEPS_CONFIG_FILE: '.github/workflows/colcon.meta'
+    # artifacts retention days
+    ARTIFACTS_RETENTION_DAYS: 5
 
 
 jobs:
@@ -156,6 +158,14 @@ jobs:
           run: |
             echo "----------------- colcon logger_all ------------------------------"
             cat ${GITHUB_WORKSPACE}/deps_log/latest/logger_all.log
+
+        - name: Save colcon log dir as artifact
+          if: ${{ failure() && steps.build-install-source-deps.conclusion == 'failure' }}
+          uses: actions/upload-artifact@v3
+          with:
+            name: build-${{ github.ref_name }}-${{ matrix.os }}-${{ matrix.build_type }}
+            path: ${{ github.workspace }}/deps_log/latest/
+            retention-days: ${{ env.ARTIFACTS_RETENTION_DAYS }}
 
         - name: Cache source-compiled installed dependencies
           if: ${{ env.action-save-cache == 'true' && steps.cache-restore-source-deps-installed.outputs.cache-hit != 'true' }}
