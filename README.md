@@ -41,8 +41,9 @@ Making use of [ilammy/msvc-dev-cmd action](https://github.com/ilammy/msvc-dev-cm
 The used generator is [Ninja](https://ninja-build.org/)
 
 
-### Output cache on error
+### Show cache and log on error
 
-If the build step fails, the CMake cache and log and printed out.
+If the libraries from source build fails, the colcon log is printed out.
+If the build step fails, the CMake cache and log and printed out, along with the directory tree.
 
-
+All the information above are also saved as [artifacts](https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts)
