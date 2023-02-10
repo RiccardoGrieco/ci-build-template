@@ -228,6 +228,16 @@ jobs:
             echo "----------------- CMAKE OUTPUT -----------------------------"
             cat ${GITHUB_WORKSPACE}/build/CMakeFiles/CMakeOutput.log
 
+        - name: Upload as artifacts CMake log and cache
+          if: ${{ failure() && (steps.configure-step.conclusion == 'failure' || steps.build-step.conclusion == 'failure' || steps.test-step.conclusion == 'failure') }}
+          uses: actions/upload-artifact@v3
+          with:
+            name: build-${{ github.ref_name }}-${{ matrix.os }}-${{ matrix.build_type }}
+            path: |
+              ${{ github.workspace }}/build/CMakeCache.txt
+              ${{ github.workspace }}/build/CMakeFiles/CMakeOutput.log
+            retention-days: ${{ env.ARTIFACTS_RETENTION_DAYS }}
+
         - name: Print tree on failure
           if: ${{ failure() }}
           shell: bash
